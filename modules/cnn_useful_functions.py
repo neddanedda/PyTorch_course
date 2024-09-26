@@ -1,3 +1,22 @@
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+
+try:
+    import torchmetrics
+except:
+    !pip install -q torchmetrics
+    import torchmetrics
+
+try:
+    import mlxtend
+except:
+    !pip install -q mlxtend
+    import mlxtend
+
+from torchmetrics import ConfusionMatrix
+from mlxtend.plotting import plot_confusion_matrix
+
 def train_step(model: torch.nn.Module,
                dataloader: torch.utils.data.DataLoader,
                optimizer: torch.optim.Optimizer,
