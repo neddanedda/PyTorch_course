@@ -2,10 +2,11 @@ import torchmetrics
 import mlxtend
 import torch
 import pandas as pd
-
+from timeit import default_timer as timer
 from torch import nn
 from torchmetrics import ConfusionMatrix
 from mlxtend.plotting import plot_confusion_matrix
+from tqdm.auto import tqdm
 
 # %%writefile train_step.py
 def train_step(model: torch.nn.Module,
