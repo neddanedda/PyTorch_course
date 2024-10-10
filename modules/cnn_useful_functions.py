@@ -133,3 +133,58 @@ def confusion_matrix_plot(model: nn.Module,
     
     plot_confusion_matrix(confmat_tensor, class_names=class_names);
 
+def plot_model_results(results: pd.DataFrame,
+                       figsize: int=12):
+    """ plotting train and test loss and accuracy over several epochs
+
+    Args:
+        results: a pd.DataFrame with 4 columns: train_loss, train_acc, test_loo, test_acc
+        figsize1: figure width
+        figsize2: figure height
+    """
+    
+    plt.figure(figsize=(figsize, figsize))
+    plt.subplot(2, 2, 1)
+    plt.plot(range(len(results["train_loss"])), results["train_loss"])
+    plt.plot(range(len(results["train_loss"])), results["test_loss"])
+    plt.title("Loss")
+    
+    plt.subplot(2, 2, 2)
+    plt.plot(range(len(results["train_loss"])), results["train_acc"])
+    plt.plot(range(len(results["train_loss"])), results["test_acc"])
+    plt.title("Accuracy")
+    
+    plt.subplot(2, 2, 3)
+    plt.scatter(results["train_loss"], results["train_acc"])
+    plt.title("Train loss vs train accuracy")
+    
+    plt.subplot(2, 2, 4)
+    plt.scatter(results["test_loss"], results["test_acc"])
+    plt.title("Test loss vs test accuracy");
+
+def plot_random_test(model: torch.nn.Module,
+                     directory,
+                     class_names,
+                     transform,
+                     total_pictures: int=4,
+                     device: str="cpu"):
+    picture_list = list(Path(directory).blob("*/*.jpg"))
+    random_pics = random.sample(range(len(picture_list)), total_pictures)
+    #
+    model.eval()
+    for pic in random_pics:
+        picture = Image.open(picture_list[pic])
+        pic_for_model = transform(picture).to(device)
+        true_class = picture_list[pic].parent.name
+        with torch.inference_mode():
+            pred = torch.softmax(model(pic_for_model.unsqueeze(dim=0)),dim=1)
+        plt.figure()
+        plt.imshow(picture)
+        plt.title(f"True: {true_class}, Pred: {class_names[torch.argmax(pred, dim=1)]}, Prob: {pred.max():.3f}")
+        plt.axis(False);
+
+
+def save_model(model: nn.Module,
+               model_path: str):
+    torch.save(obj=model.state_dict(),
+               f=Path(model_path))
